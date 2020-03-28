@@ -4,18 +4,17 @@ from copy import deepcopy
 class Address:
 
     def __init__(self):
-        self.country = None
-        self.region = None
-        self.city = None
-        self.street = None
-        self.house_number = None
-        self.apartment_number = None
-        self.postcode = None
+        self.country: str = None
+        self.region: str = None
+        self.city: str = None
+        self.street: str = None
+        self.house_number: int = None
+        self.apartment_number: int = None
+        self.postcode: int = None
 
     def __str__(self):
         ret = ''
-        for attr in self.__dict__:
-            value = self.__getattribute__(attr)
+        for attr, value in self.__dict__.items():
             if value:
                 ret += f'{attr}: {value}, '
         return ret
@@ -63,11 +62,11 @@ class AddressBuilder:
 class Person:
 
     def __init__(self, person_id, name, surname,  e_mail, phone, address):
-        self.person_id = person_id
-        self.name = name
-        self.surname = surname
-        self.e_mail = e_mail
-        self.phone = phone
+        self.person_id: int = person_id
+        self.name: str = name
+        self.surname: str = surname
+        self.e_mail: str = e_mail
+        self.phone: str = phone
         self.address = address
 
     def __str__(self):
@@ -81,11 +80,16 @@ class Student(Person):
                  address, language_level,
                  courses_id):
         super().__init__(person_id, name, surname,  e_mail, phone, address)
-        self.language_level = language_level
-        self.courses_id = courses_id
+        self.language_level: str = language_level
+        self.courses_id: list = courses_id
+
+    def add_course(self, course_id):
+        self.courses_id.append(course_id)
 
     def __str__(self):
-        return f'level: {self.language_level}, courses_id: {self.courses_id}'
+        str_person = super().__str__()
+        return f'{str_person}, level: {self.language_level}, ' \
+            f'courses_id: {self.courses_id}'
 
 
 class Teacher(Person):
@@ -93,13 +97,17 @@ class Teacher(Person):
     def __init__(self, person_id, name, surname,  e_mail, phone, address,
                  languages, courses_id, diplomas, salary):
         super().__init__(person_id, name, surname,  e_mail, phone, address)
-        self.languages = languages
-        self.courses_id = courses_id
-        self.diplomas = diplomas
-        self.salary = salary
+        self.languages: list = languages
+        self.courses_id: list = courses_id
+        self.diplomas: list = diplomas
+        self.salary: float = salary
+
+    def add_course(self, course_id):
+        self.courses_id.append(course_id)
 
     def __str__(self):
-        return f'languages: {self.languages}, courses_id: {self.courses_id}, ' \
+        str_person = super().__str__()
+        return f'{str_person}, languages: {self.languages}, courses_id: {self.courses_id}, ' \
             f'diplomas: {self.diplomas}, salary: {self.salary}'
 
 
@@ -126,19 +134,24 @@ class PersonFactory:
 class Course:
 
     def __init__(self):
-        self.course_id = None
-        self.language = None
-        self.level = None
-        self.price = None
-        self.teachers = []
-        self.students = []
-        self.address = None
-        self.books = None
+        self.course_id: int = None
+        self.language: str = None
+        self.level: str = None
+        self.price: float = None
+        self.teachers: list = []
+        self.students: list = []
+        self.address: str = None
+        self.books: list = []
+
+    def add_teacher(self, teacher_ip):
+        self.teachers.append(teacher_ip)
+
+    def add_student(self, student_ip):
+        self.students.append(student_ip)
 
     def __str__(self):
         ret = ''
-        for attr in self.__dict__:
-            value = self.__getattribute__(attr)
+        for attr, value in self.__dict__.items():
             if value:
                 ret += f'{attr}: {value}, '
         return ret
@@ -187,69 +200,30 @@ class CourseBuilder:
         return self.course
 
 
-class ChangeCourse:
-
-    @staticmethod
-    def add_student(course, new_student_id):
-        students = course.students
-        students.append(new_student_id)
-        setattr(course, 'students', students)
-
-    @staticmethod
-    def add_teacher(course, new_teacher_id):
-        new_teachers = course.teachers
-        new_teachers.append(new_teacher_id)
-        setattr(course, 'teachers', new_teachers)
-
-
-class ChangeStudent:
-
-    @staticmethod
-    def change_name(student, new_name):
-        setattr(student, 'name', new_name)
-        return student
-
-    @staticmethod
-    def add_course(student, new_course_id):
-        new_courses = student.courses_id
-        new_courses.append(new_course_id)
-        setattr(student, 'courses_id', new_courses)
-        return student
-
-
-class ChangeTeacher:
-
-    @staticmethod
-    def change_name(teacher, new_name):
-        setattr(teacher, 'name', new_name)
-
-    @staticmethod
-    def add_course(teacher, new_course_id):
-        new_courses = teacher.courses_id
-        new_courses.append(new_course_id)
-        setattr(teacher, 'courses_id', new_courses)
-
-
-class ChangeFacade:
+class SchoolManager(Person):
 
     """Pattern Facade"""
 
-    def __init__(self):
-        self.change_student = ChangeStudent()
-        self.change_teacher = ChangeTeacher()
-        self.change_course = ChangeCourse()
+    def __init__(self, person_id, name, surname,
+                 e_mail, phone, address, work_address, salary):
+        super().__init__(person_id, name, surname,
+                         e_mail, phone, address)
+        self.work_address: str = work_address
+        self.salary: float = salary
 
-    def add_teacher_to_course(self, course, teacher):
+    @staticmethod
+    def add_teacher_to_course(course, teacher):
         teacher_id = teacher.person_id
-        self.change_course.add_teacher(course, teacher_id)
+        course.add_teacher(teacher_id)
         course_id = course.course_id
-        self.change_teacher.add_course(teacher, course_id)
+        teacher.add_course(course_id)
 
-    def add_student_to_course(self, course, student):
+    @staticmethod
+    def add_student_to_course(course, student):
         student_id = student.person_id
-        self.change_course.add_student(course, student_id)
+        course.add_student(student_id)
         course_id = course.course_id
-        self.change_student.add_course(student, course_id)
+        student.add_course(course_id)
 
 
 def copy_course(course):

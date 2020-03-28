@@ -2,8 +2,7 @@ import unittest
 from classes import (Address, AddressBuilder, Person,
                      Student, Teacher, PersonFactory,
                      Course, CourseBuilder,
-                     copy_course, ChangeStudent, ChangeTeacher,
-                     ChangeCourse, ChangeFacade)
+                     copy_course, SchoolManager)
 
 
 class TestAddress(unittest.TestCase):
@@ -97,7 +96,7 @@ class TestPerson(unittest.TestCase):
 class TestStudent(unittest.TestCase):
 
     def setUp(self):
-        self.address = Address()
+        self.address = AddressBuilder().set_country('Russia').build()
         self.student = Student(2, 'Ivan', 'Ivanov',  'ivan@ivan', '9090',
                                self.address, ['English B1'], [112])
 
@@ -111,8 +110,14 @@ class TestStudent(unittest.TestCase):
         self.assertEqual(self.student.language_level, ['English B1'])
         self.assertEqual(self.student.courses_id, [112])
 
+    def test_add_course(self):
+        self.student.add_course(57)
+        self.assertIn(57, self.student.courses_id)
+
     def test_str(self):
-        self.assertEqual(str(self.student), "level: ['English B1'], "
+        self.assertEqual(str(self.student), "2, Ivan, Ivanov, "
+                                            "ivan@ivan, 9090, country: Russia, , "
+                                            "level: ['English B1'], "
                                             "courses_id: [112]")
 
 
@@ -138,8 +143,13 @@ class TestTeacher(unittest.TestCase):
         self.assertEqual(self.teacher.diplomas, ['Manchester diploma'])
         self.assertEqual(self.teacher.salary, 5000)
 
+    def test_add_course(self):
+        self.teacher.add_course(57)
+        self.assertIn(57, self.teacher.courses_id)
+
     def test_str(self):
-        self.assertEqual(str(self.teacher), "languages: ['English', 'german'], courses_id: [13], "
+        self.assertEqual(str(self.teacher), "3, Lala, Fafa, lala@fafa.com, "
+                                            f"7980-678, {self.address}, languages: ['English', 'german'], courses_id: [13], "
                                             "diplomas: ['Manchester diploma'], salary: 5000")
 
 
@@ -212,7 +222,15 @@ class TestCourse(unittest.TestCase):
         self.assertEqual(self.course.teachers, [])
         self.assertEqual(self.course.students, [])
         self.assertEqual(self.course.address, None)
-        self.assertEqual(self.course.books, None)
+        self.assertEqual(self.course.books, [])
+
+    def test_add_teacher(self):
+        self.course.add_teacher(11)
+        self.assertIn(11, self.course.teachers)
+
+    def test_add_student(self):
+        self.course.add_student(18)
+        self.assertIn(18, self.course.students)
 
     def test_str(self):
         self.assertEqual(str(self.course), '')
@@ -281,68 +299,7 @@ class TestCopy(unittest.TestCase):
         self.assertEqual(str(self.course.course), str(self.new_course.course))
 
 
-class TestChangeStudent(unittest.TestCase):
-
-    def setUp(self):
-        self.address = AddressBuilder().set_city('Rom').build()
-        self.student = PersonFactory().create_person(
-            'student', 9, 'Mama',
-            'Li', 'mama@h', '9009', self.address,
-            language_level=['Italian A2', 'English B2'],
-            courses_id=[56]
-        )
-        self.change = ChangeStudent()
-
-    def test_change_name(self):
-        self.change.change_name(self.student, 'Vika')
-        self.assertEqual(self.student.name, 'Vika')
-
-    def test_add_course(self):
-        self.change.add_course(self.student, 57)
-        self.assertIn(57, self.student.courses_id)
-
-
-class TestChangeTeacher(unittest.TestCase):
-
-    def setUp(self):
-        self.address = AddressBuilder().set_city('Rom').build()
-        self.teacher = PersonFactory().create_person(
-            'teacher', 10, 'Eva',
-            'Lop', 'eva@h', '5000-56', self.address,
-            languages=['Italian', 'English'],
-            courses_id=[56],
-            diplomas=['Rom diploma'],
-            salary=5000
-        )
-        self.change = ChangeTeacher()
-
-    def test_change_name(self):
-        self.change.change_name(self.teacher, 'Adam')
-        self.assertEqual(self.teacher.name, 'Adam')
-
-    def test_add_course(self):
-        self.change.add_course(self.teacher, 57)
-        self.assertIn(57, self.teacher.courses_id)
-
-
-class TestChangeCourse(unittest.TestCase):
-
-    def setUp(self):
-        self.address = AddressBuilder().set_city('Rom').build()
-        self.course = CourseBuilder().set_language('English').set_level('B2').\
-            set_address(self.address).set_price(300).build()
-        self.change = ChangeCourse()
-
-    def test_add_teacher(self):
-        self.change.add_teacher(self.course, 11)
-        self.assertIn(11, self.course.teachers)
-
-    def test_add_student(self):
-        self.change.add_student(self.course, 11)
-        self.assertIn(11, self.course.students)
-
-
-class TestChangeFacade(unittest.TestCase):
+class TestSchoolManager(unittest.TestCase):
 
     def setUp(self):
         self.address = AddressBuilder().set_city('Rom').build()
@@ -362,15 +319,21 @@ class TestChangeFacade(unittest.TestCase):
         )
         self.course = CourseBuilder().set_course_id(45).set_language('English').\
             set_level('B2').set_address(self.address).set_price(300).build()
-        self.course_facade = ChangeFacade()
+        self.manager = SchoolManager(19, 'Ivan', 'Ivanov', 'iva@mail.ru',
+                                     '9096', 'Kiev', 'Sing street', 1000)
+
+    def test_init(self):
+        self.assertEqual(self.manager.work_address, 'Sing street')
+        self.assertEqual(self.manager.salary, 1000)
+        self.assertEqual(self.manager.surname, 'Ivanov')
 
     def test_add_teacher_to_course(self):
-        self.course_facade.add_teacher_to_course(self.course, self.teacher)
+        self.manager.add_teacher_to_course(self.course, self.teacher)
         self.assertIn(10, self.course.teachers)
         self.assertIn(45, self.teacher.courses_id)
 
     def test_add_student_to_course(self):
-        self.course_facade.add_student_to_course(self.course, self.student)
+        self.manager.add_student_to_course(self.course, self.student)
         self.assertIn(9, self.course.students)
         self.assertIn(45, self.student.courses_id)
 
