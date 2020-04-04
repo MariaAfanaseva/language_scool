@@ -1,4 +1,6 @@
 from copy import deepcopy
+from order_pay import Order, CreditCard, CreditCardPayment
+from school import LanguageSchool
 
 
 class Address:
@@ -61,8 +63,11 @@ class AddressBuilder:
 
 class Person:
 
-    def __init__(self, person_id, name, surname,  e_mail, phone, address):
-        self.person_id: int = person_id
+    id = 0
+
+    def __init__(self, name, surname,  e_mail, phone, address):
+        Person.id += 1
+        self.person_id: int = Person.id
         self.name: str = name
         self.surname: str = surname
         self.e_mail: str = e_mail
@@ -76,10 +81,10 @@ class Person:
 
 class Student(Person):
 
-    def __init__(self, person_id, name, surname,  e_mail, phone,
+    def __init__(self, name, surname,  e_mail, phone,
                  address, language_level,
                  courses_id):
-        super().__init__(person_id, name, surname,  e_mail, phone, address)
+        super().__init__(name, surname,  e_mail, phone, address)
         self.language_level: str = language_level
         self.courses_id: list = courses_id
 
@@ -94,9 +99,9 @@ class Student(Person):
 
 class Teacher(Person):
 
-    def __init__(self, person_id, name, surname,  e_mail, phone, address,
+    def __init__(self, name, surname,  e_mail, phone, address,
                  languages, courses_id, diplomas, salary):
-        super().__init__(person_id, name, surname,  e_mail, phone, address)
+        super().__init__(name, surname,  e_mail, phone, address)
         self.languages: list = languages
         self.courses_id: list = courses_id
         self.diplomas: list = diplomas
@@ -121,11 +126,10 @@ class PersonFactory:
     }
 
     @staticmethod
-    def create_person(person_type, person_id, name,
-                      surname,  e_mail, phone, address, **kwargs):
+    def create_person(person_type, name, surname,
+                      e_mail, phone, address, **kwargs):
         person_class = PersonFactory.person_types[person_type]
-        person = person_class(person_id=person_id, name=name,
-                              surname=surname,
+        person = person_class(name=name, surname=surname,
                               e_mail=e_mail, phone=phone,
                               address=address, **kwargs)
         return person
@@ -133,8 +137,11 @@ class PersonFactory:
 
 class Course:
 
+    id = 0
+
     def __init__(self):
-        self.course_id: int = None
+        Course.id += 1
+        self.course_id: int = Course.id
         self.language: str = None
         self.level: str = None
         self.price: float = None
@@ -157,16 +164,12 @@ class Course:
         return ret
 
 
-class CourseBuilder:
+class CreateCourse:
 
     """ Pattern Builder """
 
     def __init__(self):
         self.course = Course()
-
-    def set_course_id(self, course_id):
-        self.course.course_id = course_id
-        return self
 
     def set_language(self, language):
         self.course.language = language
@@ -204,12 +207,37 @@ class SchoolManager(Person):
 
     """Pattern Facade"""
 
-    def __init__(self, person_id, name, surname,
+    school = LanguageSchool()
+
+    def __init__(self, name, surname,
                  e_mail, phone, address, work_address, salary):
-        super().__init__(person_id, name, surname,
+        super().__init__(name, surname,
                          e_mail, phone, address)
         self.work_address: str = work_address
         self.salary: float = salary
+
+        self.order = None
+        self.payment = None
+
+    @staticmethod
+    def create_person(person_type, name,
+                      surname, e_mail, phone, address, **kwargs):
+        person = PersonFactory().create_person(person_type, name,
+                                               surname, e_mail, phone, address, **kwargs)
+        SchoolManager.school.add_person(person_type, person)
+
+    @staticmethod
+    def create_course(language, level, price, address, books,
+                      teachers=None, students=None):
+        course = CreateCourse().set_language(language)\
+            .set_price(price).set_level(level).\
+            set_address(address).set_books(books)
+        if teachers:
+            course.set_teachers_id(teachers)
+        if students:
+            course.set_students_id(students)
+        course = course.build()
+        SchoolManager.school.add_course(course)
 
     @staticmethod
     def add_teacher_to_course(course, teacher):
@@ -224,6 +252,26 @@ class SchoolManager(Person):
         course.add_student(student_id)
         course_id = course.course_id
         student.add_course(course_id)
+
+    def create_order(self, customer):
+        self.order = Order(customer)
+
+    def add_course_to_order(self, course):
+        self.order.add_item(course)
+
+    def add_credit_card(self, number, owner, code):
+        credit_card = CreditCard(number, owner, code)
+        self.payment = CreditCardPayment(credit_card)
+
+    def pay_order(self):
+        email = self.order.customer.e_mail
+        phone = self.order.customer.phone
+        order_number = self.order.order_number
+        if self.payment and self.order.items:
+            print(self.order.pay(self.payment))
+            SchoolManager.school.send_message('PAY', phone, email, order_number)
+            self.order = None
+            self.payment = None
 
 
 def copy_course(course):

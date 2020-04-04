@@ -4,7 +4,7 @@ import abc
 class Payment(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def pay(self, amount):
+    def pay(self, order_number, amount):
         pass
 
 
@@ -14,8 +14,9 @@ class PayPalPayment(Payment):
         self.email = email
         self.token = token
 
-    def pay(self, amount):
-        return f'Payment bei PayPal in the {amount} made'
+    def pay(self, order_number, amount):
+        return f'Payment order {order_number} by PayPal ' \
+            f'in the {amount} made'
 
 
 class CreditCard:
@@ -34,8 +35,9 @@ class CreditCardPayment(Payment):
     def __init__(self, card):
         self.card = card
 
-    def pay(self, amount):
-        return f'Payment bei Credit Card in the {amount} made'
+    def pay(self, order_number, amount):
+        return f'Payment {order_number} by Credit Card ' \
+            f'in the {amount} made'
 
 
 class GiftCertificate:
@@ -52,26 +54,32 @@ class GiftCertificatePayment(Payment):
     def __init__(self, certificate):
         self.certificate = certificate
 
-    def pay(self, amount):
-        return f'Payment bei Gift Certificate in the {amount} made'
+    def pay(self, order_number, amount):
+        return f'Payment {order_number} by Gift Certificate ' \
+            f'in the {amount} made'
 
 
 class Order:
 
     """Pattern Strategy"""
 
-    def __init__(self):
-        self._items = []
+    number = 0
 
-    def add_course(self, item):
-        self._items.append(item)
+    def __init__(self, customer):
+        Order.number += 1
+        self.order_number = Order.number
+        self.customer = customer
+        self.items = []
+
+    def add_item(self, item):
+        self.items.append(item)
 
     def get_order_price(self):
         total_price = 0
-        for item in self._items:
+        for item in self.items:
             total_price += item.price
         return total_price
 
     def pay(self, payment):
         total_price = self.get_order_price()
-        payment.pay(total_price)
+        return payment.pay(self.order_number, total_price)
