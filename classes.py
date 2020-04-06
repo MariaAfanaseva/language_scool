@@ -1,6 +1,5 @@
 from copy import deepcopy
 from order_pay import Order, CreditCard, CreditCardPayment
-from school import LanguageSchool
 
 
 class Address:
@@ -116,13 +115,51 @@ class Teacher(Person):
             f'diplomas: {self.diplomas}, salary: {self.salary}'
 
 
+class Manager(Person):
+
+    def __init__(self, name, surname,
+                 e_mail, phone, address, school, salary):
+        super().__init__(name, surname,
+                         e_mail, phone, address)
+        self.salary: float = salary
+        self.school = school
+
+        self.order = None
+        self.payment = None
+
+    def create_order(self, customer):
+        self.order = Order(customer)
+
+    def add_course_to_order(self, course):
+        self.order.add_item(course)
+
+    def add_credit_card(self, number, owner, code):
+        credit_card = CreditCard(number, owner, code)
+        self.payment = CreditCardPayment(credit_card)
+
+    def pay_order(self):
+        email = self.order.customer.e_mail
+        phone = self.order.customer.phone
+        order_number = self.order.order_number
+        if self.payment and self.order.items:
+            print(self.order.pay(self.payment))
+            self.school.send_message('PAY', phone, email, order_number)
+            self.order = None
+            self.payment = None
+
+    def __str__(self):
+        str_person = super().__str__()
+        return f'{str_person}, school: {self.school}, salary: {self.salary}'
+
+
 class PersonFactory:
 
     """ Pattern FACTORY METHOD """
 
     person_types = {
         'teacher': Teacher,
-        'student': Student
+        'student': Student,
+        'manager': Manager
     }
 
     @staticmethod
@@ -201,77 +238,6 @@ class CreateCourse:
 
     def build(self):
         return self.course
-
-
-class SchoolManager(Person):
-
-    """Pattern Facade"""
-
-    school = LanguageSchool()
-
-    def __init__(self, name, surname,
-                 e_mail, phone, address, work_address, salary):
-        super().__init__(name, surname,
-                         e_mail, phone, address)
-        self.work_address: str = work_address
-        self.salary: float = salary
-
-        self.order = None
-        self.payment = None
-
-    @staticmethod
-    def create_person(person_type, name,
-                      surname, e_mail, phone, address, **kwargs):
-        person = PersonFactory().create_person(person_type, name,
-                                               surname, e_mail, phone, address, **kwargs)
-        SchoolManager.school.add_person(person_type, person)
-
-    @staticmethod
-    def create_course(language, level, price, address, books,
-                      teachers=None, students=None):
-        course = CreateCourse().set_language(language)\
-            .set_price(price).set_level(level).\
-            set_address(address).set_books(books)
-        if teachers:
-            course.set_teachers_id(teachers)
-        if students:
-            course.set_students_id(students)
-        course = course.build()
-        SchoolManager.school.add_course(course)
-
-    @staticmethod
-    def add_teacher_to_course(course, teacher):
-        teacher_id = teacher.person_id
-        course.add_teacher(teacher_id)
-        course_id = course.course_id
-        teacher.add_course(course_id)
-
-    @staticmethod
-    def add_student_to_course(course, student):
-        student_id = student.person_id
-        course.add_student(student_id)
-        course_id = course.course_id
-        student.add_course(course_id)
-
-    def create_order(self, customer):
-        self.order = Order(customer)
-
-    def add_course_to_order(self, course):
-        self.order.add_item(course)
-
-    def add_credit_card(self, number, owner, code):
-        credit_card = CreditCard(number, owner, code)
-        self.payment = CreditCardPayment(credit_card)
-
-    def pay_order(self):
-        email = self.order.customer.e_mail
-        phone = self.order.customer.phone
-        order_number = self.order.order_number
-        if self.payment and self.order.items:
-            print(self.order.pay(self.payment))
-            SchoolManager.school.send_message('PAY', phone, email, order_number)
-            self.order = None
-            self.payment = None
 
 
 def copy_course(course):

@@ -2,7 +2,7 @@ import unittest
 from classes import (Address, AddressBuilder, Person,
                      Student, Teacher, PersonFactory,
                      Course, CreateCourse,
-                     copy_course, SchoolManager)
+                     copy_course, Manager)
 
 
 class TestAddress(unittest.TestCase):
@@ -165,6 +165,18 @@ class TestTeacher(unittest.TestCase):
         Person.id -= 1
 
 
+class TestManager(unittest.TestCase):
+
+    def setUp(self):
+        self.manager = Manager('Ivan', 'Ivanov', 'iva@mail.ru',
+                               9096, 'Kiev', 'Lingoda', 1000)
+
+    def test_init(self):
+        self.assertEqual(self.manager.school, 'Lingoda')
+        self.assertEqual(self.manager.salary, 1000)
+        self.assertEqual(self.manager.surname, 'Ivanov')
+
+
 class TestPersonFactory(unittest.TestCase):
 
     def setUp(self):
@@ -313,67 +325,6 @@ class TestCopy(unittest.TestCase):
         self.assertEqual(str(self.course.course), str(self.new_course.course))
 
     def tearDown(self):
-        Course.id -= 1
-
-
-class TestSchoolManager(unittest.TestCase):
-
-    def setUp(self):
-        self.address = AddressBuilder().set_city('Rom').build()
-        self.teacher = PersonFactory().create_person(
-            'teacher', 'Eva',
-            'Lop', 'eva@h', '5000-56', self.address,
-            languages=['Italian', 'English'],
-            courses_id=[56],
-            diplomas=['Rom diploma'],
-            salary=5000
-        )
-        self.person_teacher_id = self.teacher.person_id
-
-        self.student = PersonFactory().create_person(
-            'student', 'Mama',
-            'Li', 'mama@h', '9009', self.address,
-            language_level=['Italian A2', 'English B2'],
-            courses_id=[56]
-        )
-        self.person_student_id = self.student.person_id
-
-        self.course = CreateCourse().set_language('English').\
-            set_level('B2').set_address(self.address).set_price(300).build()
-        self.course_id = self.course.course_id
-
-        self.manager = SchoolManager('Ivan', 'Ivanov', 'iva@mail.ru',
-                                     '9096', 'Kiev', 'Sing street', 1000)
-
-    def test_init(self):
-        self.assertEqual(self.manager.work_address, 'Sing street')
-        self.assertEqual(self.manager.salary, 1000)
-        self.assertEqual(self.manager.surname, 'Ivanov')
-
-    def test_add_teacher_to_course(self):
-        self.manager.add_teacher_to_course(self.course, self.teacher)
-        self.assertIn(self.person_teacher_id, self.course.teachers)
-        self.assertIn(self.course_id, self.teacher.courses_id)
-
-    def test_add_student_to_course(self):
-        self.manager.add_student_to_course(self.course, self.student)
-        self.assertIn(self.person_student_id, self.course.students)
-        self.assertIn(self.course_id, self.student.courses_id)
-
-    def test_pay_order(self):
-        self.manager.create_order(self.student)
-        self.assertIsNotNone(self.manager.order)
-
-        self.manager.add_course_to_order(self.course)
-        self.assertIn(self.course, self.manager.order.items)
-
-        self.manager.add_credit_card(8909766, 'Afanaseva', 9005)
-        self.assertIsNotNone(self.manager.payment)
-
-        self.manager.pay_order()
-
-    def tearDown(self):
-        Person.id -= 3
         Course.id -= 1
 
 
