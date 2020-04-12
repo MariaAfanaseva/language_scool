@@ -8,19 +8,17 @@ from classes import (Address, AddressBuilder, Person,
 class TestAddress(unittest.TestCase):
 
     def setUp(self):
-        self.address = Address()
+        self.address = Address(1, 'Russia', '', 'Moscow',
+                               'Lenina', '7', '45', '5664')
 
     def test_init(self):
-        self.assertEqual(self.address.country, None)
-        self.assertEqual(self.address.region, None)
-        self.assertEqual(self.address.city, None)
-        self.assertEqual(self.address.street, None)
-        self.assertEqual(self.address.house_number, None)
-        self.assertEqual(self.address.apartment_number, None)
-        self.assertEqual(self.address.postcode, None)
-
-    def test_str(self):
-        self.assertEqual(str(self.address), '')
+        self.assertEqual(self.address.country, 'Russia')
+        self.assertEqual(self.address.region, '')
+        self.assertEqual(self.address.city, 'Moscow')
+        self.assertEqual(self.address.street, 'Lenina')
+        self.assertEqual(self.address.house_number, '7')
+        self.assertEqual(self.address.apartment_number, '45')
+        self.assertEqual(self.address.postcode, '5664')
 
 
 class TestAddressBuilder(unittest.TestCase):
@@ -63,113 +61,75 @@ class TestAddressBuilder(unittest.TestCase):
                          self.address_builder)
         self.assertEqual(self.address_builder.address.postcode, 85642)
 
-    def test_str(self):
-        self.assertEqual(str(self.address_builder.set_country('USA').build()),
-                         'country: USA, ')
-        self.assertEqual(str(self.address_builder.set_house_number(10).
-                             set_street('Pop').set_city('Berlin').build()),
-                         'country: USA, city: Berlin, '
-                         'street: Pop, house_number: 10, ')
-
 
 class TestPerson(unittest.TestCase):
 
     def setUp(self):
         self.address = AddressBuilder().set_country('Russia').build()
-        self.person = Person('Maria', 'Afanaseva',
-                             'ff@gmail.com', '454-334', self.address)
-        self.person_id = self.person.person_id
+        self.person = Person(1, 'Maria', 'Afanaseva',
+                             'ff@gmail.com', 891678523, self.address)
 
     def test_init(self):
-        self.assertEqual(self.person.person_id, self.person_id)
+        self.assertEqual(self.person.id_person, 1)
         self.assertEqual(self.person.name, 'Maria')
         self.assertEqual(self.person.surname, 'Afanaseva')
-        self.assertEqual(self.person.e_mail, 'ff@gmail.com')
-        self.assertEqual(self.person.phone, '454-334')
+        self.assertEqual(self.person.email, 'ff@gmail.com')
+        self.assertEqual(self.person.phone, 891678523)
         self.assertEqual(self.person.address, self.address)
-
-    def test_str(self):
-        self.assertEqual(str(self.person),
-                         f'{self.person_id}, Maria, Afanaseva, ff@gmail.com, 454-334, '
-                         'country: Russia, ')
-
-    def tearDown(self):
-        Person.id -= 1
 
 
 class TestStudent(unittest.TestCase):
 
     def setUp(self):
         self.address = AddressBuilder().set_country('Russia').build()
-        self.student = Student('Ivan', 'Ivanov',  'ivan@ivan', '9090',
-                               self.address, ['English B1'], [112])
-        self.person_id = self.student.person_id
+        self.student = Student(2, 'Ivan', 'Ivanov',  'ivan@ivan', 895642,
+                               self.address, 2, ['English B1'], [112])
 
     def test_init(self):
-        self.assertEqual(self.student.person_id, self.person_id)
+        self.assertEqual(self.student.id_person, 2)
         self.assertEqual(self.student.name, 'Ivan')
         self.assertEqual(self.student.surname, 'Ivanov')
-        self.assertEqual(self.student.e_mail, 'ivan@ivan')
-        self.assertEqual(self.student.phone, '9090')
+        self.assertEqual(self.student.email, 'ivan@ivan')
+        self.assertEqual(self.student.phone, 895642)
         self.assertEqual(self.student.address, self.address)
         self.assertEqual(self.student.language_level, ['English B1'])
         self.assertEqual(self.student.courses_id, [112])
 
-    def test_add_course(self):
-        self.student.add_course(57)
-        self.assertIn(57, self.student.courses_id)
-
-    def test_str(self):
-        self.assertEqual(str(self.student), f"{self.person_id}, Ivan, Ivanov, "
-                                            "ivan@ivan, 9090, country: Russia, , "
-                                            "level: ['English B1'], "
-                                            "courses_id: [112]")
-
-    def tearDown(self):
-        Person.id -= 1
+    # def test_str(self):
+    #     self.assertEqual(str(self.student), f"2, Ivan, Ivanov, "
+    #                                         "ivan@ivan, 895642, country: Russia, , "
+    #                                         "level: ['English B1'], "
+    #                                         "courses_id: [112]")
 
 
 class TestTeacher(unittest.TestCase):
 
     def setUp(self):
-        self.address = Address()
-        self.teacher = Teacher('Lala', 'Fafa',  'lala@fafa.com',
-                               '7980-678', self.address,
+        self.address = AddressBuilder().set_city('Moscow').build()
+        self.teacher = Teacher(3, 'Lala', 'Fafa',  'lala@fafa.com',
+                               78956, self.address, 1,
                                ['English', 'german'], [13],
                                ['Manchester diploma'],
                                5000)
-        self.person_id = self.teacher.person_id
 
     def test_init(self):
-        self.assertEqual(self.teacher.person_id, self.person_id)
+        self.assertEqual(self.teacher.id_person, 3)
         self.assertEqual(self.teacher.name, 'Lala')
         self.assertEqual(self.teacher.surname, 'Fafa')
-        self.assertEqual(self.teacher.e_mail, 'lala@fafa.com')
-        self.assertEqual(self.teacher.phone, '7980-678')
+        self.assertEqual(self.teacher.email, 'lala@fafa.com')
+        self.assertEqual(self.teacher.phone, 78956)
         self.assertEqual(self.teacher.address, self.address)
         self.assertEqual(self.teacher.languages, ['English', 'german'])
         self.assertEqual(self.teacher.courses_id, [13])
         self.assertEqual(self.teacher.diplomas, ['Manchester diploma'])
         self.assertEqual(self.teacher.salary, 5000)
 
-    def test_add_course(self):
-        self.teacher.add_course(57)
-        self.assertIn(57, self.teacher.courses_id)
-
-    def test_str(self):
-        self.assertEqual(str(self.teacher), f"{self.person_id}, Lala, Fafa, lala@fafa.com, "
-                                            f"7980-678, {self.address}, languages: ['English', 'german'], courses_id: [13], "
-                                            "diplomas: ['Manchester diploma'], salary: 5000")
-
-    def tearDown(self):
-        Person.id -= 1
-
 
 class TestManager(unittest.TestCase):
 
     def setUp(self):
-        self.manager = Manager('Ivan', 'Ivanov', 'iva@mail.ru',
-                               9096, 'Kiev', 'Lingoda', 1000)
+        self.manager = Manager(4, 'Ivan', 'Ivanov', 'iva@mail.ru',
+                               9096, 'Kiev', 1, 'Lingoda', 1000)
 
     def test_init(self):
         self.assertEqual(self.manager.school, 'Lingoda')
@@ -185,8 +145,9 @@ class TestPersonFactory(unittest.TestCase):
 
     def test_create_teacher(self):
         teacher = self.person_factory.create_person(
-            'teacher', 'Nana',
-            'Li',  'nana@h', '9009', self.address, salary=2000,
+            'teacher', 5, 'Nana',
+            'Li',  'nana@h', 9009, self.address,
+            id_teacher=2, salary=2000,
             languages=['Italian', 'English'],
             courses_id=[12],
             diplomas=['Ranish diploma']
@@ -197,27 +158,28 @@ class TestPersonFactory(unittest.TestCase):
         self.assertIsInstance(teacher, Teacher)
         with self.assertRaises(TypeError):
             self.person_factory.create_person(
-                'teacher', 'Nana',
-                'Li', 'nana@h', '9009', self.address, salary=2000,
+                'teacher', 6, 'Nana',
+                'Li', 'nana@h', 9009, self.address,
+                id_teacher=2, salary=2000,
                 languages=['Italian', 'English'], courses_id=[12],
                 level=['Ranish diploma']  # need diplomas not level
             )
 
         with self.assertRaises(KeyError):
             self.person_factory.create_person(
-                'professor', 'Nana', 'Li', 'nana@h',
+                'professor', 7, 'Nana', 'Li', 'nana@h',
                 # need teacher or student not professor
                 '9009', self.address, salary=2000,
                 languages=['Italian', 'English'],
-                diplomas=['Ranish diploma']
+                diplomas=['Ranish diploma'], id_student=1,
             )
 
     def test_create_student(self):
         student = self.person_factory.create_person(
-            'student', 'Mama',
-            'Li', 'mama@h', '9009', self.address,
+            'student', 8, 'Mama',
+            'Li', 'mama@h', 9009, self.address,
             language_level=['Italian A2', 'English B2'],
-            courses_id=[56]
+            courses_id=[56], id_student=3
         )
         self.assertEqual(student.name, 'Mama')
         self.assertEqual(student.surname, 'Li')
@@ -225,21 +187,18 @@ class TestPersonFactory(unittest.TestCase):
         self.assertIsInstance(student, Student)
         with self.assertRaises(TypeError):
             self.person_factory.create_person(
-                'student', 'Nana',
-                'Li', 'nana@h', '9009', self.address,
+                'student', 9, 'Nana',
+                'Li', 'nana@h', 9000, self.address,
                 language_level=['Italian A2', 'English B2'],
                 diplomas=['Ranish diploma']  # need courses not diplomas
             )
-
-    def tearDown(self):
-        Person.id -= 1
 
 
 class TestCourse(unittest.TestCase):
 
     def setUp(self):
         self.course = Course()
-        self.course_id = self.course.course_id
+        self.id_course = self.course.id_course
 
     def test_init(self):
         self.assertEqual(self.course.language, None)
@@ -259,7 +218,7 @@ class TestCourse(unittest.TestCase):
         self.assertIn(18, self.course.students)
 
     def test_str(self):
-        self.assertEqual(str(self.course), f'course_id: {self.course_id}, ')
+        self.assertEqual(str(self.course), f'id_course: {self.id_course}, ')
 
     def tearDown(self):
         Course.id -= 1

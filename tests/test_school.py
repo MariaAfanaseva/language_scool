@@ -10,11 +10,12 @@ class TestLanguageSchool(unittest.TestCase):
         self.school = LanguageSchool('Lingoda', 'Berlin')
 
     def test_create_person(self):
-        self.school.create_person('teacher', 'Nana',
-                                   'Li',  'nana@h', '9009', self.address, salary=2000,
-                                   languages=['Italian', 'English'],
-                                   courses_id=[12],
-                                   diplomas=['Ranish diploma'])
+        self.school.create_person('teacher', 3, 'Nana',
+                                   'Li',  'nana@h', '9009', 2, salary=2000,
+                                   id_teacher=2,
+                                   languages='Italian, English',
+                                   courses_id='12',
+                                   diplomas='Ranish diploma')
 
         teacher = self.school.teachers[0]
         self.assertNotEqual(self.school.teachers, [])

@@ -4,20 +4,21 @@ from order_pay import Order, CreditCard, CreditCardPayment
 
 class Address:
 
-    def __init__(self):
-        self.country: str = None
-        self.region: str = None
-        self.city: str = None
-        self.street: str = None
-        self.house_number: int = None
-        self.apartment_number: int = None
-        self.postcode: int = None
+    def __init__(self, id_address, country, region, city, street,
+                 house_number, apartment_number, postcode):
+        self.id_address: int = id_address
+        self.country: str = country
+        self.region: str = region
+        self.city: str = city
+        self.street: str = street
+        self.house_number: str = house_number
+        self.apartment_number: str = apartment_number
+        self.postcode: str = postcode
 
     def __str__(self):
         ret = ''
-        for attr, value in self.__dict__.items():
-            if value:
-                ret += f'{attr}: {value}, '
+        for value in self.__dict__.values():
+            ret += f'{value},'
         return ret
 
 
@@ -26,7 +27,11 @@ class AddressBuilder:
     """ Pattern Builder """
 
     def __init__(self):
-        self.address = Address()
+        self.address = Address(None, '', '', '', '', '', '', '')
+
+    def set_id_address(self, id_address):
+        self.address.id_address = id_address
+        return self
 
     def set_country(self, country):
         self.address.country = country
@@ -62,33 +67,28 @@ class AddressBuilder:
 
 class Person:
 
-    id = 0
-
-    def __init__(self, name, surname,  e_mail, phone, address):
-        Person.id += 1
-        self.person_id: int = Person.id
+    def __init__(self, id_person, name, surname,  email, phone, address):
+        self.id_person: int = id_person
         self.name: str = name
         self.surname: str = surname
-        self.e_mail: str = e_mail
-        self.phone: str = phone
+        self.email: str = email
+        self.phone: int = phone
         self.address = address
 
     def __str__(self):
-        return f'{self.person_id}, {self.name}, {self.surname}, ' \
-            f'{self.e_mail}, {self.phone}, {self.address}'
+        return f'{self.id_person}, {self.name}, {self.surname}, ' \
+            f'{self.email}, {self.phone}, {self.address}'
 
 
 class Student(Person):
 
-    def __init__(self, name, surname,  e_mail, phone,
-                 address, language_level,
+    def __init__(self, id_person, name, surname,  email, phone,
+                 address, id_student, language_level,
                  courses_id):
-        super().__init__(name, surname,  e_mail, phone, address)
+        super().__init__(id_person, name, surname,  email, phone, address)
+        self.id_student: int = id_student
         self.language_level: str = language_level
-        self.courses_id: list = courses_id
-
-    def add_course(self, course_id):
-        self.courses_id.append(course_id)
+        self.courses_id: str = courses_id
 
     def __str__(self):
         str_person = super().__str__()
@@ -98,16 +98,14 @@ class Student(Person):
 
 class Teacher(Person):
 
-    def __init__(self, name, surname,  e_mail, phone, address,
-                 languages, courses_id, diplomas, salary):
-        super().__init__(name, surname,  e_mail, phone, address)
-        self.languages: list = languages
-        self.courses_id: list = courses_id
-        self.diplomas: list = diplomas
+    def __init__(self, id_person, name, surname,  email, phone, address,
+                 id_teacher, languages, courses_id, diplomas, salary):
+        super().__init__(id_person, name, surname,  email, phone, address)
+        self.id_teacher: int = id_teacher
+        self.languages: str = languages
+        self.courses_id: str = courses_id
+        self.diplomas: str = diplomas
         self.salary: float = salary
-
-    def add_course(self, course_id):
-        self.courses_id.append(course_id)
 
     def __str__(self):
         str_person = super().__str__()
@@ -117,10 +115,11 @@ class Teacher(Person):
 
 class Manager(Person):
 
-    def __init__(self, name, surname,
-                 e_mail, phone, address, school, salary):
-        super().__init__(name, surname,
-                         e_mail, phone, address)
+    def __init__(self, id_person, name, surname,
+                 email, phone, address, id_manager, school, salary):
+        super().__init__(id_person, name, surname,
+                         email, phone, address)
+        self.id_manager: int = id_manager
         self.salary: float = salary
         self.school = school
 
@@ -138,7 +137,7 @@ class Manager(Person):
         self.payment = CreditCardPayment(credit_card)
 
     def pay_order(self):
-        email = self.order.customer.e_mail
+        email = self.order.customer.email
         phone = self.order.customer.phone
         order_number = self.order.order_number
         if self.payment and self.order.items:
@@ -163,11 +162,12 @@ class PersonFactory:
     }
 
     @staticmethod
-    def create_person(person_type, name, surname,
-                      e_mail, phone, address, **kwargs):
+    def create_person(person_type, id_person, name, surname,
+                      email, phone, address, **kwargs):
         person_class = PersonFactory.person_types[person_type]
-        person = person_class(name=name, surname=surname,
-                              e_mail=e_mail, phone=phone,
+        person = person_class(id_person=id_person, name=name,
+                              surname=surname,
+                              email=email, phone=phone,
                               address=address, **kwargs)
         return person
 
@@ -178,7 +178,7 @@ class Course:
 
     def __init__(self):
         Course.id += 1
-        self.course_id: int = Course.id
+        self.id_course: int = Course.id
         self.language: str = None
         self.level: str = None
         self.price: float = None

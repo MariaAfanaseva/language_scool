@@ -16,10 +16,10 @@ class LanguageSchool:
         self.email_notifier = CreateNotifier.get_notifier('EMAIL', 'languageSchool@gmail.com')
         self.sms_notifier = CreateNotifier.get_notifier('SMS', 500)
 
-    def create_person(self, person_type, name,
-                      surname, e_mail, phone, address, **kwargs):
-        person = PersonFactory().create_person(person_type, name,
-                                               surname, e_mail, phone, address, **kwargs)
+    def create_person(self, person_type, id_person, name,
+                      surname, e_mail, phone, id_address, **kwargs):
+        person = PersonFactory().create_person(person_type, id_person, name,
+                                               surname, e_mail, phone, id_address, **kwargs)
         if person_type == 'teacher':
             self.teachers.append(person)
         elif person_type == 'student':
