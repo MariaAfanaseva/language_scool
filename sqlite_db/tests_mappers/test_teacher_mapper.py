@@ -2,69 +2,72 @@ import unittest
 import sqlite3
 from classes import AddressBuilder, PersonFactory
 from sqlite_db.mappers.teacher_mapper import TeacherMapper
+from sqlite_db.create_sqlite_db import DatabaseBuilder
 
 
-class TestTeacherMapperInsert(unittest.TestCase):
+class TestTeacherMapper(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        builder = DatabaseBuilder('../test_db.sqlite')
+        builder.create_database()
 
     def setUp(self):
-        self.connect = sqlite3.connect('../school_db.sqlite')
+        self.connect = sqlite3.connect('../test_db.sqlite')
         self.teacher_mapper = TeacherMapper(self.connect)
-        self.address = AddressBuilder().set_city('London').set_street('Putina').build()
-        self.person_factory = PersonFactory()
-        self.teacher = self.person_factory.create_person(
-                    'teacher', None, 'TestTest',
-                    'Test',  'test@mail.ru', 9009, self.address,
-                    id_teacher=2, salary=2000,
-                    languages='Italian, English',
-                    courses_id=12,
-                    diplomas='Test diploma'
-                )
 
-    def test_insert(self):
-        self.teacher_mapper.insert(self.teacher)
+    def test_work(self):
 
-    def test_find_by_id(self):
+        #  insert
+        address = AddressBuilder().set_city('London').set_street('Putina').build()
+        person_factory = PersonFactory()
+        new_teacher = person_factory.create_person(
+            'teacher', None, 'TestTest 1',
+            'Test 1', 'test@mail.ru', 9009, address,
+            id_teacher=None, salary=2000,
+            languages='Italian, English',
+            courses_id='1',
+            diplomas='Test diploma 1'
+        )
+        self.teacher_mapper.insert(new_teacher)
+
+        # count
+        count = self.teacher_mapper.count()
+        self.assertEqual(count, 2)
+
+        # find
         teacher = self.teacher_mapper.find_by_id(2)
-        self.assertEqual(teacher.surname, 'Test')
+        self.assertEqual(teacher.surname, 'Test 1')
         self.assertEqual(teacher.id_teacher, 2)
 
+        #  update
+        address = teacher.address
+        address.street = 'Lenon'
+        address.postcode = 456248
+        address.house_number = 5
+        address.apartment_number = 23
 
-class TestTeacherMapperUpdate(unittest.TestCase):
+        teacher.phone = 98956421
+        teacher.salary = 5000
+        teacher.address = address
+        self.teacher_mapper.update(teacher)
 
-    def setUp(self):
-        self.connect = sqlite3.connect('../school_db.sqlite')
-        self.teacher_mapper = TeacherMapper(self.connect)
-        address = AddressBuilder().set_id_address(2).set_city('London'). \
-            set_street('Putina').set_street('Lenon').set_house_number(5). \
-            set_apartment_number(23).build()
-        person_factory = PersonFactory()
-        self.teacher = person_factory.create_person(
-            'teacher', 2, 'TestTest',
-            'Test', 'testtestovich@mail.ru',
-            98956421, address,
-            id_teacher=2, salary=5000,
-            languages='Italian, English',
-            courses_id='12, 15',
-            diplomas='Test diploma'
-        )
+        # find updated
+        teacher = self.teacher_mapper.find_by_id(2)
+        self.assertEqual(teacher.salary, 5000)
+        self.assertEqual(teacher.phone, 98956421)
 
-    def test_update(self):
-        self.teacher_mapper.update(self.teacher)
+        # delete
+        self.teacher_mapper.delete(teacher)
 
-    #  run separately
-    # def test_delete(self):
-    #     self.teacher_mapper.delete(self.teacher)
+        # count
+        count = self.teacher_mapper.count()
+        self.assertEqual(count, 1)
 
-
-class TestTeacherMapperCount(unittest.TestCase):
-
-    def setUp(self):
-        self.connect = sqlite3.connect('../school_db.sqlite')
-        self.teacher_mapper = TeacherMapper(self.connect)
-
-    def test_count(self):
-        result = self.teacher_mapper.count()
-        print(result)
+    @classmethod
+    def tearDownClass(cls):
+        builder = DatabaseBuilder('../test_db.sqlite')
+        builder.create_database()
 
 
 if __name__ == '__main__':

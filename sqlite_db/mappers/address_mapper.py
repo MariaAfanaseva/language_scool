@@ -1,5 +1,4 @@
-import sqlite3
-from classes import AddressBuilder
+from classes import Address
 
 
 class AddressMapper:
@@ -37,9 +36,8 @@ class AddressMapper:
 
         self.connection.commit()
 
-
-if __name__ == '__main__':
-    address = AddressBuilder().set_city('Moscow').build()
-    mapper = AddressMapper(sqlite3.connect('school_db.sqlite'))
-    mapper.insert(address)
-    print(mapper.id_address)
+    def find_by_id(self, id_addr):
+        self.cursor.execute("SELECT * FROM ADDRESSES "
+                            f"WHERE ADDRESSES.ID_ADDRESS=?", (id_addr,))
+        result = self.cursor.fetchone()
+        return Address(*result)

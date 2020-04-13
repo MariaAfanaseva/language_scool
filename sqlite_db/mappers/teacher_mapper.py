@@ -49,9 +49,11 @@ class TeacherMapper:
                             "INNER JOIN TEACHERS ON PERSONS.id_person = TEACHERS.id_person "
                             "WHERE TEACHERS.id_teacher=?", (id_teacher,))
         result = self.cursor.fetchone()
-
+        addr_mapper = AddressMapper(self.connection)
+        address = addr_mapper.find_by_id(result[5])
         person_factory = PersonFactory()
-        teacher = person_factory.create_person('teacher', *result[:6], id_teacher=result[6],
+        teacher = person_factory.create_person('teacher', *result[:5],
+                                               address=address, id_teacher=result[6],
                                                languages=result[7], courses_id=result[8],
                                                diplomas=result[9], salary=result[10])
         if teacher:
@@ -77,9 +79,9 @@ class TeacherMapper:
         except Exception as e:
             raise DbUpdateException(e.args)
 
-    def delete(self, teacher):
+    def delete(self, obj):
         delete_script = f"DELETE FROM TEACHERS WHERE id_teacher = ?"
-        self.cursor.execute(delete_script, (teacher.id_teacher,))
+        self.cursor.execute(delete_script, (obj.id_teacher,))
         try:
             self.connection.commit()
         except Exception as e:
