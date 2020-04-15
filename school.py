@@ -1,20 +1,35 @@
-from send_info import CreateNotifier
 from classes import PersonFactory, CreateCourse
+from create_message import (PayMessage, NewsMessage,
+                            EmailMessage, SMSMessage)
 
 
 class LanguageSchool:
 
     """Pattern Facade"""
 
-    def __init__(self, name, address):
+    def __init__(self, name, address, phone, email):
         self.name = name
         self.address = address
         self.courses: list = []
         self.teachers: list = []
         self.students: list = []
         self.managers: list = []
-        self.email_notifier = CreateNotifier.get_notifier('EMAIL', 'languageSchool@gmail.com')
-        self.sms_notifier = CreateNotifier.get_notifier('SMS', 500)
+        self.phone = phone
+        self.email = email
+
+        self.message_pay = PayMessage('Pay course',
+                                      'Course paid successfully. Order number ')
+        self.news_message = NewsMessage('News', 'New courses for you')
+
+        self.set_sender()
+
+    def set_sender(self):
+        send_email = EmailMessage(school_email=self.email)
+        send_phone = SMSMessage(school_phone=self.phone)
+
+        self.message_pay.attach(send_email)
+        self.message_pay.attach(send_phone)
+        self.news_message.attach(send_email)
 
     def create_person(self, person_type, id_person, name,
                       surname, e_mail, phone, id_address, **kwargs):
@@ -53,13 +68,8 @@ class LanguageSchool:
         course_id = course.course_id
         student.add_course(course_id)
 
-    def send_message(self, message_type, phone, email, order_number):
+    def send_message(self, message_type, phone, email, data):
         if message_type == 'PAY':
-            if email:
-                self.email_notifier.notify(email, 'Pay course',
-                                           'Congratulations!'
-                                           f'You paid for the order number {order_number}.')
-            if phone:
-                self.sms_notifier.notify(phone, 'Pay course',
-                                         'Congratulations!'
-                                         f'You paid for the order number {order_number}.')
+            self.message_pay.data = phone, email, data
+        elif message_type == 'NEWS':
+            self.news_message.data = phone, email, data

@@ -7,7 +7,8 @@ class TestLanguageSchool(unittest.TestCase):
 
     def setUp(self):
         self.address = AddressBuilder().set_city('Rom').build()
-        self.school = LanguageSchool('Lingoda', 'Berlin')
+        self.school = LanguageSchool('Lingoda', 'Berlin',
+                                     800, 'lingoda@gmail.com')
 
     def test_create_person(self):
         self.school.create_person('teacher', 3, 'Nana',
@@ -28,6 +29,11 @@ class TestLanguageSchool(unittest.TestCase):
         self.assertNotEqual(self.school.courses, [])
         self.assertEqual(course.language, 'English')
         self.assertEqual(course.teachers, [4])
+
+    def test_work_send_message(self):
+        self.school.send_message('PAY', 891645782, 'mari@maol.ru', 5)
+        self.school.send_message('NEWS', 854622176, 'all@mail.ru',
+                                 'latin course and spain course')
 
 
 if __name__ == '__main__':

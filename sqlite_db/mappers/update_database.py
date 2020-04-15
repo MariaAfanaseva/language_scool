@@ -60,7 +60,7 @@ class UpdateDatabase:
         return cls.current.update_db_class
 
 
-class UpdateDBObject:
+class DomainObject:
     def mark_new(self):
         UpdateDatabase.get_current().register_new(self)
 

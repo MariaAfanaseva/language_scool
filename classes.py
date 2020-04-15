@@ -1,6 +1,6 @@
 from copy import deepcopy
 from order_pay import Order, CreditCard, CreditCardPayment
-from sqlite_db.mappers.update_database import UpdateDBObject
+from sqlite_db.mappers.update_database import DomainObject
 
 
 class Address:
@@ -97,7 +97,7 @@ class Student(Person):
             f'courses_id: {self.courses_id}'
 
 
-class Teacher(Person, UpdateDBObject):
+class Teacher(Person, DomainObject):
 
     def __init__(self, id_person, name, surname,  email, phone, address,
                  id_teacher, languages, courses_id, diplomas, salary):
