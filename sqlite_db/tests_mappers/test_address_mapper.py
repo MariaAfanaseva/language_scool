@@ -3,7 +3,7 @@ import sqlite3
 from sqlite_db.mappers.teacher_mapper import TeacherMapper
 from sqlite_db.mappers.address_mapper import AddressMapper
 from sqlite_db.create_sqlite_db import DatabaseBuilder
-from classes import AddressBuilder
+from address import AddressBuilder
 
 
 class TestTeacherMapper(unittest.TestCase):

@@ -1,4 +1,4 @@
-from classes import PersonFactory
+from persons import PersonFactory
 from sqlite_db.mappers.address_mapper import AddressMapper
 from sqlite_db.mappers.person_mapper import PersonMapper
 from sqlite_db.mappers.errors import (DbDeleteException,

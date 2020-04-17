@@ -1,8 +1,8 @@
 import unittest
-from classes import (Address, AddressBuilder, Person,
-                     Student, Teacher, PersonFactory,
-                     Course, CreateCourse,
-                     copy_course, Manager)
+from persons import (Person, Student, Teacher,
+                     PersonFactory, Manager)
+from address import Address, AddressBuilder
+from course import Course, CreateCourse, copy_course
 
 
 class TestAddress(unittest.TestCase):

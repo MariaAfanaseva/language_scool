@@ -1,6 +1,7 @@
 import unittest
 import sqlite3
-from classes import AddressBuilder, PersonFactory
+from persons import PersonFactory
+from address import AddressBuilder
 from sqlite_db.mappers.teacher_mapper import TeacherMapper
 from sqlite_db.create_sqlite_db import DatabaseBuilder
 

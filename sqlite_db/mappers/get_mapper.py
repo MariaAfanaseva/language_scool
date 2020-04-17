@@ -1,5 +1,5 @@
 from sqlite_db.mappers.teacher_mapper import TeacherMapper
-from classes import Teacher, Student
+from persons import Teacher
 
 
 class MapperRegistry:

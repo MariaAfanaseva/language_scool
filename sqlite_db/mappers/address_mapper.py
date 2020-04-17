@@ -1,4 +1,4 @@
-from classes import Address
+from address import Address
 
 
 class AddressMapper:

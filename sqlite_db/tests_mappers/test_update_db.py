@@ -3,7 +3,8 @@ import sqlite3
 from sqlite_db.create_sqlite_db import DatabaseBuilder
 from sqlite_db.mappers.update_database import UpdateDatabase
 from sqlite_db.mappers.get_mapper import MapperRegistry
-from classes import PersonFactory, AddressBuilder
+from persons import PersonFactory
+from address import AddressBuilder
 from sqlite_db.mappers.teacher_mapper import TeacherMapper
 
 

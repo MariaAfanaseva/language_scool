@@ -1,5 +1,7 @@
 import unittest
-from classes import CreateCourse, PersonFactory, AddressBuilder
+from persons import PersonFactory
+from course import CreateCourse
+from address import AddressBuilder
 from order_pay import (Order, CreditCard, CreditCardPayment,
                        PayPalPayment, GiftCertificate,
                        GiftCertificatePayment)
@@ -11,9 +13,9 @@ class TestOrder(unittest.TestCase):
         self.address = AddressBuilder().set_city('Rom').build()
         self.course_1 = CreateCourse().set_price(500).build()
         self.course_2 = CreateCourse().set_price(400).build()
-        self.customer = PersonFactory.create_person('student', 'Mama',
+        self.customer = PersonFactory.create_person('student', 1, 'Mama',
                                                     'Li', 'mama@h', '9009', self.address,
-                                                    language_level=['Italian A2', 'English B2'],
+                                                    id_student=1, language_level=['Italian A2', 'English B2'],
                                                     courses_id=[56])
         self.order = Order(self.customer)
         self.number = self.order.order_number

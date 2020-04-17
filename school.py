@@ -1,6 +1,7 @@
-from classes import PersonFactory, CreateCourse
-from create_message import (PayMessage, NewsMessage,
-                            EmailMessage, SMSMessage)
+from persons import PersonFactory
+from course import CreateCourse
+from message import (PayMessage, NewsMessage,
+                     EmailMessage, SMSMessage)
 
 
 class LanguageSchool:

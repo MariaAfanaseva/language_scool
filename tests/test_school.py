@@ -1,5 +1,5 @@
 import unittest
-from classes import AddressBuilder
+from address import AddressBuilder
 from school import LanguageSchool
 
 

@@ -28,9 +28,11 @@ class Subject:
 
 
 class Observer(metaclass=abc.ABCMeta):
+
     def __init__(self):
         self._subject = None
         self._observer_state = None
+        self._communication_type = None
 
     @abc.abstractmethod
     def send(self, arg):
@@ -45,9 +47,8 @@ class Message(Subject):
 
     @data.setter
     def data(self, data):
-        self._phone = data[0]
-        self._email = data[1]
-        self._data = data[2]
+        # magical antipattern data[0], data[1], data[2]
+        self._phone, self._email, self._data = data
         self._notify()
 
 
@@ -71,7 +72,9 @@ class EmailMessage(Observer):
 
     def __init__(self, school_email):
         super().__init__()
-        self.notifier = CreateNotifier.get_notifier('EMAIL', school_email)
+        self._communication_type = 'EMAIL'
+        self.notifier = CreateNotifier.get_notifier(self._communication_type,
+                                                    school_email)
 
     def send(self, obj, phone, email, data):
         if isinstance(obj, PayMessage) and email:
@@ -84,7 +87,9 @@ class SMSMessage(Observer):
 
     def __init__(self, school_phone):
         super().__init__()
-        self.notifier = CreateNotifier.get_notifier('SMS', school_phone)
+        self._communication_type = 'EMAIL'
+        self.notifier = CreateNotifier.get_notifier(self._communication_type,
+                                                    school_phone)
 
     def send(self, obj, phone, email, data):
         if isinstance(obj, PayMessage) and phone:
