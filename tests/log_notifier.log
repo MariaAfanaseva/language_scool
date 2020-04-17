@@ -61,3 +61,12 @@ disconnect: Exit 800
 connect: Login in lingoda@gmail.com, 
 send: Send to all@mail.ru from lingoda@gmail.com, subject News, message New courses for you latin course and spain course, 
 disconnect: Exit lingoda@gmail.com
+connect: Login in 800, 
+send: Send to 891645782 from 800, subject Pay course, message Course paid successfully. Order number  5, 
+disconnect: Exit 800
+connect: Login in lingoda@gmail.com, 
+send: Send to mari@maol.ru from lingoda@gmail.com, subject Pay course, message Course paid successfully. Order number  5, 
+disconnect: Exit lingoda@gmail.com
+connect: Login in lingoda@gmail.com, 
+send: Send to all@mail.ru from lingoda@gmail.com, subject News, message New courses for you latin course and spain course, 
+disconnect: Exit lingoda@gmail.com

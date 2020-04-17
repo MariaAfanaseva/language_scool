@@ -12,7 +12,7 @@ class TestLanguageSchool(unittest.TestCase):
 
     def test_create_person(self):
         self.school.create_person('teacher', 3, 'Nana',
-                                   'Li',  'nana@h', '9009', 2, salary=2000,
+                                   'Li',  'nana@h', '9009', 2,
                                    id_teacher=2,
                                    languages='Italian, English',
                                    courses_id='12',

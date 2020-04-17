@@ -1,5 +1,5 @@
 from order_pay import Order, CreditCard, CreditCardPayment
-from sqlite_db.mappers.update_database import DomainObject
+from sqlite_db.mappers.unit_of_work import DomainObject
 
 
 class Person:
@@ -36,28 +36,26 @@ class Student(Person):
 class Teacher(Person, DomainObject):
 
     def __init__(self, id_person, name, surname,  email, phone, address,
-                 id_teacher, languages, courses_id, diplomas, salary):
+                 id_teacher, languages, courses_id, diplomas):
         super().__init__(id_person, name, surname,  email, phone, address)
         self.id_teacher: int = id_teacher
         self.languages: str = languages
         self.courses_id: str = courses_id
         self.diplomas: str = diplomas
-        self.salary: float = salary
 
     def __str__(self):
         str_person = super().__str__()
         return f'{str_person}, languages: {self.languages}, courses_id: {self.courses_id}, ' \
-            f'diplomas: {self.diplomas}, salary: {self.salary}'
+            f'diplomas: {self.diplomas}'
 
 
 class Manager(Person):
 
     def __init__(self, id_person, name, surname,
-                 email, phone, address, id_manager, school, salary):
+                 email, phone, address, id_manager, school):
         super().__init__(id_person, name, surname,
                          email, phone, address)
         self.id_manager: int = id_manager
-        self.salary: float = salary
         self.school = school
 
         self.order = None
@@ -85,7 +83,7 @@ class Manager(Person):
 
     def __str__(self):
         str_person = super().__str__()
-        return f'{str_person}, school: {self.school}, salary: {self.salary}'
+        return f'{str_person}, school: {self.school}'
 
 
 class PersonFactory:

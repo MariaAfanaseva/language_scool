@@ -1,14 +1,14 @@
 import unittest
 import sqlite3
 from sqlite_db.create_sqlite_db import DatabaseBuilder
-from sqlite_db.mappers.update_database import UpdateDatabase
+from sqlite_db.mappers.unit_of_work import UnitOfWork
 from sqlite_db.mappers.get_mapper import MapperRegistry
 from persons import PersonFactory
 from address import AddressBuilder
 from sqlite_db.mappers.teacher_mapper import TeacherMapper
 
 
-class TestUpdateDatabase(unittest.TestCase):
+class TestUnityOfWork(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -19,8 +19,8 @@ class TestUpdateDatabase(unittest.TestCase):
         self.connect = sqlite3.connect('../test_db.sqlite')
 
     def test_add_new(self):
-        UpdateDatabase.new_current()
-        self.update = UpdateDatabase.get_current()
+        UnitOfWork.new_current()
+        self.update = UnitOfWork.get_current()
         self.update.set_mapper_registry(MapperRegistry(self.connect))
         person_factory = PersonFactory()
         address = AddressBuilder().set_country('Germany').set_city('Berlin').\
@@ -29,13 +29,13 @@ class TestUpdateDatabase(unittest.TestCase):
         new_teacher = person_factory.create_person(
             'teacher', None, 'TestTest new',
             'Test new', 'test@mail.ru', 9009, address,
-            id_teacher=None, salary=2000,
+            id_teacher=None,
             languages='Italian, English',
             courses_id='1',
             diplomas='Test diploma new'
         )
         new_teacher.mark_new()
-        UpdateDatabase.get_current().commit()
+        UnitOfWork.get_current().commit()
 
         #  get teacher
         mapper = TeacherMapper(self.connect)
@@ -46,13 +46,13 @@ class TestUpdateDatabase(unittest.TestCase):
         # update
         teacher.name = 'Anna Test'
         teacher.mark_update()
-        UpdateDatabase.get_current().commit()
+        UnitOfWork.get_current().commit()
         teacher = mapper.find_by_id(2)
         self.assertEqual(teacher.name, 'Anna Test')
 
         # delete
         teacher.mark_removed()
-        UpdateDatabase.get_current().commit()
+        UnitOfWork.get_current().commit()
         self.assertLessEqual(mapper.count(), 1)
 
     @classmethod

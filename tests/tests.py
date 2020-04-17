@@ -109,8 +109,7 @@ class TestTeacher(unittest.TestCase):
         self.teacher = Teacher(3, 'Lala', 'Fafa',  'lala@fafa.com',
                                78956, self.address, 1,
                                ['English', 'german'], [13],
-                               ['Manchester diploma'],
-                               5000)
+                               ['Manchester diploma'])
 
     def test_init(self):
         self.assertEqual(self.teacher.id_person, 3)
@@ -122,18 +121,16 @@ class TestTeacher(unittest.TestCase):
         self.assertEqual(self.teacher.languages, ['English', 'german'])
         self.assertEqual(self.teacher.courses_id, [13])
         self.assertEqual(self.teacher.diplomas, ['Manchester diploma'])
-        self.assertEqual(self.teacher.salary, 5000)
 
 
 class TestManager(unittest.TestCase):
 
     def setUp(self):
         self.manager = Manager(4, 'Ivan', 'Ivanov', 'iva@mail.ru',
-                               9096, 'Kiev', 1, 'Lingoda', 1000)
+                               9096, 'Kiev', 1, 'Lingoda')
 
     def test_init(self):
         self.assertEqual(self.manager.school, 'Lingoda')
-        self.assertEqual(self.manager.salary, 1000)
         self.assertEqual(self.manager.surname, 'Ivanov')
 
 
@@ -147,7 +144,7 @@ class TestPersonFactory(unittest.TestCase):
         teacher = self.person_factory.create_person(
             'teacher', 5, 'Nana',
             'Li',  'nana@h', 9009, self.address,
-            id_teacher=2, salary=2000,
+            id_teacher=2,
             languages=['Italian', 'English'],
             courses_id=[12],
             diplomas=['Ranish diploma']
@@ -160,7 +157,7 @@ class TestPersonFactory(unittest.TestCase):
             self.person_factory.create_person(
                 'teacher', 6, 'Nana',
                 'Li', 'nana@h', 9009, self.address,
-                id_teacher=2, salary=2000,
+                id_teacher=2,
                 languages=['Italian', 'English'], courses_id=[12],
                 level=['Ranish diploma']  # need diplomas not level
             )
@@ -169,7 +166,7 @@ class TestPersonFactory(unittest.TestCase):
             self.person_factory.create_person(
                 'professor', 7, 'Nana', 'Li', 'nana@h',
                 # need teacher or student not professor
-                '9009', self.address, salary=2000,
+                '9009', self.address,
                 languages=['Italian', 'English'],
                 diplomas=['Ranish diploma'], id_student=1,
             )

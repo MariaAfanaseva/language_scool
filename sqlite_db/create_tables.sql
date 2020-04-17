@@ -13,7 +13,7 @@ id_address TEXT);
 
 DROP TABLE IF EXISTS teachers;
 CREATE TABLE teachers (id_teacher INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-id_person INTEGER, languages TEXT, courses_id TEXT, diplomas TEXT, salary REAL,
+id_person INTEGER, languages TEXT, courses_id TEXT, diplomas TEXT,
 FOREIGN KEY(id_person) REFERENCES persons(id_person));
 
 DROP TABLE IF EXISTS students;
@@ -22,7 +22,7 @@ id_person INTEGER, language_level TEXT, courses_id TEXT, FOREIGN KEY(id_person) 
 
 DROP TABLE IF EXISTS managers;
 CREATE TABLE managers (id_manager INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-id_person INTEGER, school TEXT, salary REAL, FOREIGN KEY(id_person) REFERENCES persons(id_person));
+id_person INTEGER, school TEXT, FOREIGN KEY(id_person) REFERENCES persons(id_person));
 
 DROP TABLE IF EXISTS courses;
 CREATE TABLE courses (id_course INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,

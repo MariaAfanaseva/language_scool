@@ -1,7 +1,7 @@
 import threading
 
 
-class UpdateDatabase:
+class UnitOfWork:
 
     """
     Pattern Unit of work
@@ -49,7 +49,7 @@ class UpdateDatabase:
 
     @staticmethod
     def new_current():
-        __class__.set_current(UpdateDatabase())
+        __class__.set_current(UnitOfWork())
 
     @classmethod
     def set_current(cls, update_db_class):
@@ -62,10 +62,10 @@ class UpdateDatabase:
 
 class DomainObject:
     def mark_new(self):
-        UpdateDatabase.get_current().register_new(self)
+        UnitOfWork.get_current().register_new(self)
 
     def mark_update(self):
-        UpdateDatabase.get_current().register_update(self)
+        UnitOfWork.get_current().register_update(self)
 
     def mark_removed(self):
-        UpdateDatabase.get_current().register_remove(self)
+        UnitOfWork.get_current().register_remove(self)

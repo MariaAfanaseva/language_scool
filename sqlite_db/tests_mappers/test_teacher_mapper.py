@@ -25,7 +25,7 @@ class TestTeacherMapper(unittest.TestCase):
         new_teacher = person_factory.create_person(
             'teacher', None, 'TestTest 1',
             'Test 1', 'test@mail.ru', 9009, address,
-            id_teacher=None, salary=2000,
+            id_teacher=None,
             languages='Italian, English',
             courses_id='1',
             diplomas='Test diploma 1'
@@ -49,13 +49,11 @@ class TestTeacherMapper(unittest.TestCase):
         address.apartment_number = 23
 
         teacher.phone = 98956421
-        teacher.salary = 5000
         teacher.address = address
         self.teacher_mapper.update(teacher)
 
         # find updated
         teacher = self.teacher_mapper.find_by_id(2)
-        self.assertEqual(teacher.salary, 5000)
         self.assertEqual(teacher.phone, 98956421)
 
         # delete

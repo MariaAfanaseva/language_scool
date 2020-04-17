@@ -8,8 +8,8 @@ VALUES ('Russia', 'Moscow region', 'Selenograd', 18, 12, 45, 456278);
 INSERT INTO persons (name, surname, email, phone, id_address)
 VALUES ('Ivan', 'Ivanov', 'ivanov@gmail.ru', 8916457485, 1);
 
-INSERT INTO teachers (id_person, languages, courses_id, diplomas, salary)
-VALUES (1, 'English', '1, 2', 'London diploma', 50000.56);
+INSERT INTO teachers (id_person, languages, courses_id, diplomas)
+VALUES (1, 'English', '1, 2', 'London diploma');
 
 COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;

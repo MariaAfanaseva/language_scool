@@ -34,9 +34,9 @@ class TeacherMapper:
         id_person = self._create_person(new_teacher)
 
         insert = f"INSERT INTO teachers (id_person, languages, " \
-            f"courses_id, diplomas, salary) " \
+            f"courses_id, diplomas) " \
             f"VALUES ('{id_person}', '{new_teacher.languages}', " \
-            f"'{new_teacher.courses_id}', '{new_teacher.diplomas}', '{new_teacher.salary}')"
+            f"'{new_teacher.courses_id}', '{new_teacher.diplomas}')"
         self.cursor.execute(insert)
         self._set_id()
         self.connection.commit()
@@ -45,7 +45,7 @@ class TeacherMapper:
         self.cursor.execute("SELECT PERSONS.ID_PERSON, PERSONS.NAME, PERSONS.SURNAME, "
                             "PERSONS.EMAIL, PERSONS.PHONE, PERSONS.id_address, "
                             "TEACHERS.id_teacher, TEACHERS.languages, TEACHERS.courses_id,"
-                            "TEACHERS.diplomas, TEACHERS.salary FROM PERSONS "
+                            "TEACHERS.diplomas FROM PERSONS "
                             "INNER JOIN TEACHERS ON PERSONS.id_person = TEACHERS.id_person "
                             "WHERE TEACHERS.id_teacher=?", (id_teacher,))
         result = self.cursor.fetchone()
@@ -55,7 +55,7 @@ class TeacherMapper:
         teacher = person_factory.create_person('teacher', *result[:5],
                                                address=address, id_teacher=result[6],
                                                languages=result[7], courses_id=result[8],
-                                               diplomas=result[9], salary=result[10])
+                                               diplomas=result[9])
         if teacher:
             return teacher
         else:
@@ -70,9 +70,9 @@ class TeacherMapper:
         self.addr_mapper.update(addr)
         self.person_mapper.update(updated_teacher)
         update_script = f"UPDATE TEACHERS SET languages=?, courses_id=?, " \
-            f"diplomas=?, salary=? WHERE id_teacher=?"
+            f"diplomas=? WHERE id_teacher=?"
         self.cursor.execute(update_script, (updated_teacher.languages, updated_teacher.courses_id,
-                                            updated_teacher.diplomas, updated_teacher.salary,
+                                            updated_teacher.diplomas,
                                             updated_teacher.id_teacher))
         try:
             self.connection.commit()
@@ -92,3 +92,11 @@ class TeacherMapper:
         self.cursor.execute(count_script)
         result = self.cursor.fetchone()[0]
         return result
+
+    def all(self):
+        teachers = []
+        for id_teacher in range(1, self.count()+1):
+            teacher = self.find_by_id(id_teacher)
+            teachers.append(teacher)
+        return teachers
+
